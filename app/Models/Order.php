@@ -1,22 +1,15 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
-{
-    protected $fillable = [
-        'user_id', 'status', 'notes', 'total'
-    ];
+class Order extends Model {
+    protected $fillable = ['order_number', 'customer_name', 'total_price', 'status', 'user_id'];
 
-    public function user()
-    {
+    public function items() { return $this->hasMany(OrderItem::class); }
+
+    // دي العلاقة اللي الـ Dashboard بتدور عليها
+    public function user() {
         return $this->belongsTo(User::class);
-    }
-
-    public function items()
-    {
-        return $this->hasMany(OrderItem::class);
     }
 }

@@ -11,12 +11,17 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // 1. الكود القديم بتاعك (بيجيب إحصائيات العامل)
         $transactions = InventoryTransaction::with('product')
             ->where('user_id', Auth::id())
             ->latest()->take(10)->get();
 
         $products_count = Product::where('is_active', true)->count();
 
-        return view('worker.dashboard', compact('transactions', 'products_count'));
+        // 2. الإضافة الجديدة (علشان كروت المنتجات تظهر وم تضربش الـ View)
+        $products = Product::with('category')->where('is_active', true)->get();
+
+        // بنبعت كله مع بعضه للـ View
+        return view('worker.dashboard', compact('transactions', 'products_count', 'products'));
     }
 }

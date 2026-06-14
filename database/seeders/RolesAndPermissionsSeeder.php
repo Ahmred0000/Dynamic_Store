@@ -13,24 +13,25 @@ class RolesAndPermissionsSeeder extends Seeder
         // مسح الكاش
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // إنشاء الصلاحيات
-        Permission::create(['name' => 'manage-inventory']);
-        Permission::create(['name' => 'manage-users']);
-        Permission::create(['name' => 'view-reports']);
-        Permission::create(['name' => 'manage-orders']);
-        Permission::create(['name' => 'deduct-inventory']);
-        Permission::create(['name' => 'view-products']);
-        Permission::create(['name' => 'place-order']);
-        Permission::create(['name' => 'track-orders']);
+        // مصفوفة الصلاحيات
+        $permissions = [
+            'manage-inventory', 'manage-users', 'view-reports', 'manage-orders',
+            'deduct-inventory', 'view-products', 'place-order', 'track-orders'
+        ];
+
+        // إنشاء الصلاحيات إذا لم تكن موجودة
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
 
         // إنشاء الأدوار وتعيين الصلاحيات
-        $admin = Role::create(['name' => 'admin']);
-        $admin->givePermissionTo(Permission::all());
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $admin->syncPermissions(Permission::all()); // syncPermissions أحسن من givePermissionTo في التعديل
 
-        $worker = Role::create(['name' => 'worker']);
-        $worker->givePermissionTo(['deduct-inventory']);
+        $worker = Role::firstOrCreate(['name' => 'worker']);
+        $worker->syncPermissions(['deduct-inventory']);
 
-        $customer = Role::create(['name' => 'customer']);
-        $customer->givePermissionTo(['view-products', 'place-order', 'track-orders']);
+        $customer = Role::firstOrCreate(['name' => 'customer']);
+        $customer->syncPermissions(['view-products', 'place-order', 'track-orders']);
     }
 }
